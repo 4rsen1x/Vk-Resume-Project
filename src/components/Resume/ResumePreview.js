@@ -1,5 +1,5 @@
 import React from 'react';
-import { Div, Button } from '@vkontakte/vkui';
+import { Div, Button, Group } from '@vkontakte/vkui';
 import { Icon24Document } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
 import { ResumeTemplates } from './ResumeTemplates';
@@ -11,7 +11,7 @@ export const ResumePreview = ({
   onDownloadResume 
 }) => {
   return (
-    <div>
+    <Group>
       <Div>
         <Button 
           before={<Icon24Document />} 
@@ -31,7 +31,7 @@ export const ResumePreview = ({
           />
         </div>
       </Div>
-    </div>
+    </Group>
   );
 };
 
@@ -45,7 +45,8 @@ ResumePreview.propTypes = {
     position: PropTypes.string,
     education: PropTypes.array,
     experience: PropTypes.array,
-    skills: PropTypes.array
+    skills: PropTypes.array,
+    customSections: PropTypes.array // Добавляем поддержку кастомных секций
   }).isRequired,
   selectedTemplate: PropTypes.string.isRequired,
   resumeRef: PropTypes.object.isRequired,

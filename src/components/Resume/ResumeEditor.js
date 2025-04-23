@@ -14,6 +14,7 @@ import { Icon24Camera } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
 import { EducationForm } from './EducationForm';
 import { ExperienceForm } from './ExperienceForm';
+import { CustomSectionForm } from './CustomSectionForm';
 
 export const ResumeEditor = ({ 
   userData, 
@@ -27,10 +28,15 @@ export const ResumeEditor = ({
   onAddExperience, 
   onRemoveEducation, 
   onRemoveExperience, 
+  onCustomSectionChange,
+  onAddCustomSection,
+  onRemoveCustomSection,
+  onMoveCustomSection,
   showTip 
 }) => {
   return (
     <Group>
+      {/* Существующие группы и поля остаются без изменений */}
       <Group>
         <FormItem top="Фото">
           <File
@@ -140,6 +146,18 @@ export const ResumeEditor = ({
           showTip={showTip}
         />
       </Group>
+
+      {/* Добавляем новую группу для кастомных секций */}
+      <Group>
+        <CustomSectionForm 
+          customSections={userData.customSections || []}
+          onCustomSectionChange={onCustomSectionChange}
+          onAddCustomSection={onAddCustomSection}
+          onRemoveCustomSection={onRemoveCustomSection}
+          onMoveCustomSection={onMoveCustomSection}
+          showTip={showTip}
+        />
+      </Group>
     </Group>
   );
 };
@@ -154,7 +172,8 @@ ResumeEditor.propTypes = {
     position: PropTypes.string,
     education: PropTypes.array,
     experience: PropTypes.array,
-    skills: PropTypes.array
+    skills: PropTypes.array,
+    customSections: PropTypes.array
   }).isRequired,
   selectedTemplate: PropTypes.string.isRequired,
   onInputChange: PropTypes.func.isRequired,
@@ -166,5 +185,9 @@ ResumeEditor.propTypes = {
   onAddExperience: PropTypes.func.isRequired,
   onRemoveEducation: PropTypes.func.isRequired,
   onRemoveExperience: PropTypes.func.isRequired,
+  onCustomSectionChange: PropTypes.func.isRequired,
+  onAddCustomSection: PropTypes.func.isRequired,
+  onRemoveCustomSection: PropTypes.func.isRequired,
+  onMoveCustomSection: PropTypes.func.isRequired,
   showTip: PropTypes.func.isRequired
 };

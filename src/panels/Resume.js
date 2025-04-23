@@ -33,7 +33,8 @@ export const Resume = ({ id }) => {
     position: 'Frontend Developer',
     education: [{ institution: '', degree: '', year: '' }],
     experience: [{ company: '', position: '', period: '', description: '' }],
-    skills: ['React', 'JavaScript', 'HTML/CSS']
+    skills: ['React', 'JavaScript', 'HTML/CSS'],
+    customSections: [] // Add empty array for custom sections
   });
 
   useEffect(() => {
@@ -190,6 +191,53 @@ export const Resume = ({ id }) => {
     );
   };
 
+  // Add handlers for custom sections
+  const handleCustomSectionChange = (index, field, value) => {
+    const newCustomSections = [...userData.customSections];
+    newCustomSections[index][field] = value;
+    setUserData(prev => ({
+      ...prev,
+      customSections: newCustomSections
+    }));
+  };
+
+  const addCustomSection = () => {
+    setUserData(prev => ({
+      ...prev,
+      customSections: [...prev.customSections, { title: 'Новый раздел', content: '' }]
+    }));
+  };
+
+  const removeCustomSection = (index) => {
+    const newCustomSections = [...userData.customSections];
+    newCustomSections.splice(index, 1);
+    setUserData(prev => ({
+      ...prev,
+      customSections: newCustomSections
+    }));
+  };
+
+  const moveCustomSection = (index, direction) => {
+    if (
+      (direction === 'up' && index === 0) || 
+      (direction === 'down' && index === userData.customSections.length - 1)
+    ) {
+      return;
+    }
+
+    const newCustomSections = [...userData.customSections];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    // Swap sections
+    [newCustomSections[index], newCustomSections[newIndex]] = 
+    [newCustomSections[newIndex], newCustomSections[index]];
+    
+    setUserData(prev => ({
+      ...prev,
+      customSections: newCustomSections
+    }));
+  };
+
   return (
     <Panel id={id}>
       <PanelHeader
@@ -236,6 +284,10 @@ export const Resume = ({ id }) => {
           onAddExperience={addExperience}
           onRemoveEducation={removeEducation}
           onRemoveExperience={removeExperience}
+          onCustomSectionChange={handleCustomSectionChange}
+          onAddCustomSection={addCustomSection}
+          onRemoveCustomSection={removeCustomSection}
+          onMoveCustomSection={moveCustomSection}
           showTip={showTip}
         />
       ) : (

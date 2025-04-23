@@ -2,6 +2,52 @@ import React from 'react';
 import { Card, Avatar } from '@vkontakte/vkui';
 import PropTypes from 'prop-types';
 
+// Добавим компонент для отображения кастомных секций в классическом стиле
+const ClassicCustomSection = ({ section }) => (
+  <div style={{ marginBottom: 20 }}>
+    <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: 5 }}>{section.title}</h3>
+    <div style={{ whiteSpace: 'pre-line' }}>{section.content}</div>
+  </div>
+);
+
+// Добавим компонент для отображения кастомных секций в современном стиле
+const ModernCustomSection = ({ section }) => (
+  <div style={{ marginBottom: 30 }}>
+    <h3 style={{ color: '#2688eb', textAlign: 'center' }}>{section.title}</h3>
+    <div style={{ 
+      background: '#fff', 
+      padding: 15, 
+      borderRadius: 10,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      whiteSpace: 'pre-line'
+    }}>
+      {section.content}
+    </div>
+  </div>
+);
+
+// Добавим компонент для отображения кастомных секций в креативном стиле
+const CreativeCustomSection = ({ section }) => (
+  <div style={{ marginBottom: 30 }}>
+    <h3 style={{ 
+      position: 'relative', 
+      paddingBottom: 10,
+      marginBottom: 15
+    }}>
+      <span style={{ 
+        position: 'absolute', 
+        bottom: 0, 
+        left: 0, 
+        width: 50, 
+        height: 3, 
+        background: '#4a76a8' 
+      }}></span>
+      {section.title}
+    </h3>
+    <div style={{ whiteSpace: 'pre-line' }}>{section.content}</div>
+  </div>
+);
+
 // Classic template
 const ClassicTemplate = ({ userData }) => (
   <Card mode="shadow" style={{ padding: 20 }}>
@@ -43,7 +89,7 @@ const ClassicTemplate = ({ userData }) => (
       ))}
     </div>
     
-    <div>
+    <div style={{ marginBottom: 20 }}>
       <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: 5 }}>Образование</h3>
       {userData.education.map((edu, index) => (
         <div key={index} style={{ marginBottom: 10 }}>
@@ -55,12 +101,18 @@ const ClassicTemplate = ({ userData }) => (
         </div>
       ))}
     </div>
+    
+    {/* Отображаем кастомные секции */}
+    {userData.customSections && userData.customSections.map((section, index) => (
+      <ClassicCustomSection key={index} section={section} />
+    ))}
   </Card>
 );
 
 // Modern template
 const ModernTemplate = ({ userData }) => (
   <Card mode="shadow" style={{ padding: 20, background: '#f5f5f5' }}>
+    {/* Существующий код шаблона */}
     <div style={{ textAlign: 'center', marginBottom: 30 }}>
       {userData.photo && <Avatar size={120} src={userData.photo} style={{ margin: '0 auto 15px' }} />}
       <h1 style={{ margin: '0 0 5px', fontSize: 28 }}>{userData.firstName} {userData.lastName}</h1>
@@ -109,7 +161,7 @@ const ModernTemplate = ({ userData }) => (
       ))}
     </div>
     
-    <div>
+    <div style={{ marginBottom: 30 }}>
       <h3 style={{ color: '#2688eb', textAlign: 'center' }}>Образование</h3>
       {userData.education.map((edu, index) => (
         <div key={index} style={{ 
@@ -125,12 +177,18 @@ const ModernTemplate = ({ userData }) => (
         </div>
       ))}
     </div>
+    
+    {/* Отображаем кастомные секции */}
+    {userData.customSections && userData.customSections.map((section, index) => (
+      <ModernCustomSection key={index} section={section} />
+    ))}
   </Card>
 );
 
 // Creative template
 const CreativeTemplate = ({ userData }) => (
   <Card mode="shadow" style={{ padding: 0, overflow: 'hidden' }}>
+    {/* Существующий код шаблона */}
     <div style={{ 
       background: 'linear-gradient(135deg, #4a76a8 0%, #2688eb 100%)', 
       color: 'white',
@@ -209,7 +267,7 @@ const CreativeTemplate = ({ userData }) => (
         ))}
       </div>
       
-      <div>
+      <div style={{ marginBottom: 30 }}>
         <h3 style={{ 
           position: 'relative', 
           paddingBottom: 10,
@@ -235,6 +293,11 @@ const CreativeTemplate = ({ userData }) => (
           </div>
         ))}
       </div>
+      
+      {/* Отображаем кастомные секции */}
+      {userData.customSections && userData.customSections.map((section, index) => (
+        <CreativeCustomSection key={index} section={section} />
+      ))}
     </div>
   </Card>
 );
@@ -260,6 +323,29 @@ ResumeTemplates.propTypes = {
     position: PropTypes.string,
     education: PropTypes.array,
     experience: PropTypes.array,
-    skills: PropTypes.array
+    skills: PropTypes.array,
+    customSections: PropTypes.array
+  }).isRequired
+};
+
+// Добавляем PropTypes для компонентов секций
+ClassicCustomSection.propTypes = {
+  section: PropTypes.shape({
+    title: PropTypes.string,
+    content: PropTypes.string
+  }).isRequired
+};
+
+ModernCustomSection.propTypes = {
+  section: PropTypes.shape({
+    title: PropTypes.string,
+    content: PropTypes.string
+  }).isRequired
+};
+
+CreativeCustomSection.propTypes = {
+  section: PropTypes.shape({
+    title: PropTypes.string,
+    content: PropTypes.string
   }).isRequired
 };
