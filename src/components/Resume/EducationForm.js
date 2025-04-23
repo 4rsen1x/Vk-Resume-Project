@@ -35,11 +35,6 @@ export const EducationForm = ({
               value={edu.institution}
               onChange={(e) => onEducationChange(index, 'institution', e.target.value)}
               placeholder="Название университета/колледжа"
-              after={
-                <EnhanceButton 
-                  onClick={() => onEnhance(edu.institution, 'учебное заведение', 'education', index, 'institution')} 
-                />
-              }
             />
           </FormItem>
           <FormItem top="Степень/Специальность">
@@ -47,11 +42,6 @@ export const EducationForm = ({
               value={edu.degree}
               onChange={(e) => onEducationChange(index, 'degree', e.target.value)}
               placeholder="Бакалавр информатики"
-              after={
-                <EnhanceButton 
-                  onClick={() => onEnhance(edu.degree, 'степень/специальность', 'education', index, 'degree')} 
-                />
-              }
             />
           </FormItem>
           <FormItem top="Годы обучения">

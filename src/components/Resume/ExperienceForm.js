@@ -36,11 +36,6 @@ export const ExperienceForm = ({
               value={exp.company}
               onChange={(e) => onExperienceChange(index, 'company', e.target.value)}
               placeholder="Название компании"
-              after={
-                <EnhanceButton 
-                  onClick={() => onEnhance(exp.company, 'компания', 'experience', index, 'company')} 
-                />
-              }
             />
           </FormItem>
           <FormItem top="Должность">
@@ -48,11 +43,6 @@ export const ExperienceForm = ({
               value={exp.position}
               onChange={(e) => onExperienceChange(index, 'position', e.target.value)}
               placeholder="Frontend Developer"
-              after={
-                <EnhanceButton 
-                  onClick={() => onEnhance(exp.position, 'должность', 'experience', index, 'position')} 
-                />
-              }
             />
           </FormItem>
           <FormItem top="Период работы">

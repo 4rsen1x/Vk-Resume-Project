@@ -201,10 +201,40 @@ export const Resume = ({ id }) => {
     }));
   };
 
-  const addCustomSection = () => {
+  const addCustomSection = (sectionType = 'custom') => {
+    // Predefined section templates
+    const sectionTemplates = {
+      projects: { 
+        title: 'Проекты', 
+        content: 'Опишите ваши ключевые проекты, указав технологии и результаты.' 
+      },
+      certificates: { 
+        title: 'Сертификаты', 
+        content: 'Перечислите ваши профессиональные сертификаты и достижения.' 
+      },
+      languages: { 
+        title: 'Иностранные языки', 
+        content: 'Укажите языки, которыми вы владеете, и уровень владения.' 
+      },
+      publications: { 
+        title: 'Публикации', 
+        content: 'Перечислите ваши публикации, статьи или исследования.' 
+      },
+      hobbies: { 
+        title: 'Хобби и интересы', 
+        content: 'Расскажите о ваших увлечениях, которые могут быть интересны работодателю.' 
+      },
+      custom: { 
+        title: 'Новый раздел', 
+        content: '' 
+      }
+    };
+    
+    const newSection = sectionTemplates[sectionType] || sectionTemplates.custom;
+    
     setUserData(prev => ({
       ...prev,
-      customSections: [...prev.customSections, { title: 'Новый раздел', content: '' }]
+      customSections: [...prev.customSections, newSection]
     }));
   };
 

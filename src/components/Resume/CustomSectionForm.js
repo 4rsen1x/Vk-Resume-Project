@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FormItem, 
   Input, 
@@ -6,7 +6,10 @@ import {
   Button, 
   IconButton,
   Div,
-  Card
+  Card,
+  Select,
+  ActionSheet,
+  ActionSheetItem
 } from '@vkontakte/vkui';
 import { 
   Icon24Cancel, 
@@ -26,6 +29,22 @@ export const CustomSectionForm = ({
   showTip,
   onEnhance
 }) => {
+  const [sectionTypePopup, setSectionTypePopup] = useState(null);
+  const addSectionButtonRef = useRef(null); // Create a ref for the button
+
+  const openSectionTypePopup = () => {
+    setSectionTypePopup('section-type');
+  };
+
+  const closeSectionTypePopup = () => {
+    setSectionTypePopup(null);
+  };
+
+  const handleAddSection = (sectionType) => {
+    onAddCustomSection(sectionType);
+    closeSectionTypePopup();
+  };
+
   return (
     <FormItem top="Дополнительные разделы">
       {customSections.map((section, index) => (
@@ -92,11 +111,43 @@ export const CustomSectionForm = ({
       <Button 
         size="m" 
         mode="secondary" 
-        onClick={onAddCustomSection}
+        onClick={openSectionTypePopup}
         before={<Icon24Add />}
+        getRootRef={addSectionButtonRef} // Assign the ref to the button
       >
         Добавить новый раздел
       </Button>
+
+      {sectionTypePopup && (
+        <ActionSheet 
+          onClose={closeSectionTypePopup}
+          toggleRef={addSectionButtonRef} // Pass the ref to ActionSheet
+          iosCloseItem={
+            <ActionSheetItem autoclose mode="cancel">
+              Отмена
+            </ActionSheetItem>
+          }
+        >
+          <ActionSheetItem onClick={() => handleAddSection('projects')}>
+            Проекты
+          </ActionSheetItem>
+          <ActionSheetItem onClick={() => handleAddSection('certificates')}>
+            Сертификаты
+          </ActionSheetItem>
+          <ActionSheetItem onClick={() => handleAddSection('languages')}>
+            Иностранные языки
+          </ActionSheetItem>
+          <ActionSheetItem onClick={() => handleAddSection('publications')}>
+            Публикации
+          </ActionSheetItem>
+          <ActionSheetItem onClick={() => handleAddSection('hobbies')}>
+            Хобби и интересы
+          </ActionSheetItem>
+          <ActionSheetItem onClick={() => handleAddSection('custom')}>
+            Свой раздел
+          </ActionSheetItem>
+        </ActionSheet>
+      )}
     </FormItem>
   );
 };
