@@ -4,17 +4,20 @@ import {
   Input, 
   Textarea, 
   Button, 
-  IconButton 
+  IconButton,
+  Div
 } from '@vkontakte/vkui';
 import { Icon24Cancel } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
+import { EnhanceButton } from '../AIEnhancement';
 
 export const ExperienceForm = ({ 
   experience, 
   onExperienceChange, 
   onAddExperience, 
   onRemoveExperience, 
-  showTip 
+  showTip,
+  onEnhance
 }) => {
   return (
     <FormItem top="Опыт работы">
@@ -33,6 +36,11 @@ export const ExperienceForm = ({
               value={exp.company}
               onChange={(e) => onExperienceChange(index, 'company', e.target.value)}
               placeholder="Название компании"
+              after={
+                <EnhanceButton 
+                  onClick={() => onEnhance(exp.company, 'компания', 'experience', index, 'company')} 
+                />
+              }
             />
           </FormItem>
           <FormItem top="Должность">
@@ -40,6 +48,11 @@ export const ExperienceForm = ({
               value={exp.position}
               onChange={(e) => onExperienceChange(index, 'position', e.target.value)}
               placeholder="Frontend Developer"
+              after={
+                <EnhanceButton 
+                  onClick={() => onEnhance(exp.position, 'должность', 'experience', index, 'position')} 
+                />
+              }
             />
           </FormItem>
           <FormItem top="Период работы">
@@ -55,12 +68,17 @@ export const ExperienceForm = ({
               onChange={(e) => onExperienceChange(index, 'description', e.target.value)}
               placeholder="Разработка и поддержка веб-приложений с использованием React"
               after={
-                <Button
-                  mode="tertiary"
-                  onClick={() => showTip('Опишите ваши основные достижения и обязанности на этой позиции')}
-                >
-                  ?
-                </Button>
+                <Div style={{ display: 'flex', gap: 8 }}>
+                  <EnhanceButton 
+                    onClick={() => onEnhance(exp.description, 'описание обязанностей', 'experience', index, 'description')} 
+                  />
+                  <Button
+                    mode="tertiary"
+                    onClick={() => showTip('Опишите ваши основные достижения и обязанности на этой позиции')}
+                  >
+                    ?
+                  </Button>
+                </Div>
               }
             />
           </FormItem>
@@ -85,5 +103,6 @@ ExperienceForm.propTypes = {
   onExperienceChange: PropTypes.func.isRequired,
   onAddExperience: PropTypes.func.isRequired,
   onRemoveExperience: PropTypes.func.isRequired,
-  showTip: PropTypes.func.isRequired
+  showTip: PropTypes.func.isRequired,
+  onEnhance: PropTypes.func.isRequired
 };

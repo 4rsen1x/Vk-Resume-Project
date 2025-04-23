@@ -3,17 +3,20 @@ import {
   FormItem, 
   Input, 
   Button, 
-  IconButton 
+  IconButton,
+  Div
 } from '@vkontakte/vkui';
 import { Icon24Cancel } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
+import { EnhanceButton } from '../AIEnhancement';
 
 export const EducationForm = ({ 
   education, 
   onEducationChange, 
   onAddEducation, 
   onRemoveEducation, 
-  showTip 
+  showTip,
+  onEnhance
 }) => {
   return (
     <FormItem top="Образование">
@@ -32,6 +35,11 @@ export const EducationForm = ({
               value={edu.institution}
               onChange={(e) => onEducationChange(index, 'institution', e.target.value)}
               placeholder="Название университета/колледжа"
+              after={
+                <EnhanceButton 
+                  onClick={() => onEnhance(edu.institution, 'учебное заведение', 'education', index, 'institution')} 
+                />
+              }
             />
           </FormItem>
           <FormItem top="Степень/Специальность">
@@ -39,6 +47,11 @@ export const EducationForm = ({
               value={edu.degree}
               onChange={(e) => onEducationChange(index, 'degree', e.target.value)}
               placeholder="Бакалавр информатики"
+              after={
+                <EnhanceButton 
+                  onClick={() => onEnhance(edu.degree, 'степень/специальность', 'education', index, 'degree')} 
+                />
+              }
             />
           </FormItem>
           <FormItem top="Годы обучения">
@@ -68,5 +81,6 @@ EducationForm.propTypes = {
   onEducationChange: PropTypes.func.isRequired,
   onAddEducation: PropTypes.func.isRequired,
   onRemoveEducation: PropTypes.func.isRequired,
-  showTip: PropTypes.func.isRequired
+  showTip: PropTypes.func.isRequired,
+  onEnhance: PropTypes.func.isRequired
 };

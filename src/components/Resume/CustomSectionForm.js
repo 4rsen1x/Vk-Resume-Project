@@ -15,6 +15,7 @@ import {
   Icon24Add
 } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
+import { EnhanceButton } from '../AIEnhancement';
 
 export const CustomSectionForm = ({ 
   customSections, 
@@ -22,7 +23,8 @@ export const CustomSectionForm = ({
   onAddCustomSection, 
   onRemoveCustomSection, 
   onMoveCustomSection,
-  showTip 
+  showTip,
+  onEnhance
 }) => {
   return (
     <FormItem top="Дополнительные разделы">
@@ -34,6 +36,11 @@ export const CustomSectionForm = ({
                 value={section.title}
                 onChange={(e) => onCustomSectionChange(index, 'title', e.target.value)}
                 placeholder="Например: Проекты, Публикации, Хобби"
+                after={
+                  <EnhanceButton 
+                    onClick={() => onEnhance(section.title, 'название раздела', 'customSection', index, 'title')} 
+                  />
+                }
               />
             </FormItem>
             <Div style={{ display: 'flex', alignItems: 'center' }}>
@@ -66,12 +73,17 @@ export const CustomSectionForm = ({
               placeholder="Опишите содержание этого раздела"
               rows={3}
               after={
-                <Button
-                  mode="tertiary"
-                  onClick={() => showTip('Добавьте информацию, которая дополнит ваше резюме')}
-                >
-                  ?
-                </Button>
+                <Div style={{ display: 'flex', gap: 8 }}>
+                  <EnhanceButton 
+                    onClick={() => onEnhance(section.content, 'содержание раздела', 'customSection', index, 'content')} 
+                  />
+                  <Button
+                    mode="tertiary"
+                    onClick={() => showTip('Добавьте информацию, которая дополнит ваше резюме')}
+                  >
+                    ?
+                  </Button>
+                </Div>
               }
             />
           </FormItem>
@@ -100,5 +112,6 @@ CustomSectionForm.propTypes = {
   onAddCustomSection: PropTypes.func.isRequired,
   onRemoveCustomSection: PropTypes.func.isRequired,
   onMoveCustomSection: PropTypes.func.isRequired,
-  showTip: PropTypes.func.isRequired
+  showTip: PropTypes.func.isRequired,
+  onEnhance: PropTypes.func.isRequired
 };

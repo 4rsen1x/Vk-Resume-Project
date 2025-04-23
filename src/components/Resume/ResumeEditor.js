@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Group, 
   FormItem, 
@@ -8,13 +8,15 @@ import {
   Button, 
   Select, 
   Div, 
-  File 
+  File,
+  ModalRoot
 } from '@vkontakte/vkui';
 import { Icon24Camera } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
 import { EducationForm } from './EducationForm';
 import { ExperienceForm } from './ExperienceForm';
 import { CustomSectionForm } from './CustomSectionForm';
+import { EnhanceButton, EnhancementModal } from '../AIEnhancement';
 
 export const ResumeEditor = ({ 
   userData, 
@@ -34,9 +36,63 @@ export const ResumeEditor = ({
   onMoveCustomSection,
   showTip 
 }) => {
+  const [activeModal, setActiveModal] = useState(null);
+  const [enhancementData, setEnhancementData] = useState({
+    text: '',
+    fieldName: '',
+    fieldType: '',
+    index: null,
+    subField: null
+  });
+
+  const openEnhancementModal = (text, fieldName, fieldType, index = null, subField = null) => {
+    setEnhancementData({ text, fieldName, fieldType, index, subField });
+    setActiveModal('enhancement');
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+  };
+
+  const handleAcceptEnhancement = (enhancedText) => {
+    const { fieldType, index, subField } = enhancementData;
+    
+    switch (fieldType) {
+      case 'input':
+        onInputChange(enhancementData.fieldName, enhancedText);
+        break;
+      case 'skills':
+        onSkillsChange({ target: { value: enhancedText } });
+        break;
+      case 'education':
+        onEducationChange(index, subField, enhancedText);
+        break;
+      case 'experience':
+        onExperienceChange(index, subField, enhancedText);
+        break;
+      case 'customSection':
+        onCustomSectionChange(index, subField, enhancedText);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const modal = (
+    <ModalRoot activeModal={activeModal} onClose={closeModal}>
+      <EnhancementModal
+        id="enhancement"
+        onClose={closeModal}
+        originalText={enhancementData.text}
+        fieldName={enhancementData.fieldName}
+        onAccept={handleAcceptEnhancement}
+      />
+    </ModalRoot>
+  );
+
   return (
     <Group>
-      {/* Существующие группы и поля остаются без изменений */}
+      {modal}
       <Group>
         <FormItem top="Фото">
           <File
@@ -58,6 +114,11 @@ export const ResumeEditor = ({
           <Input
             value={userData.firstName}
             onChange={(e) => onInputChange('firstName', e.target.value)}
+            after={
+              <EnhanceButton 
+                onClick={() => openEnhancementModal(userData.firstName, 'имя', 'input', null, 'firstName')} 
+              />
+            }
           />
         </FormItem>
 
@@ -65,6 +126,11 @@ export const ResumeEditor = ({
           <Input
             value={userData.lastName}
             onChange={(e) => onInputChange('lastName', e.target.value)}
+            after={
+              <EnhanceButton 
+                onClick={() => openEnhancementModal(userData.lastName, 'фамилия', 'input', null, 'lastName')} 
+              />
+            }
           />
         </FormItem>
 
@@ -91,6 +157,11 @@ export const ResumeEditor = ({
             value={userData.position}
             onChange={(e) => onInputChange('position', e.target.value)}
             placeholder="Frontend Developer"
+            after={
+              <EnhanceButton 
+                onClick={() => openEnhancementModal(userData.position, 'должность', 'input', null, 'position')} 
+              />
+            }
           />
         </FormItem>
       </Group>
@@ -116,12 +187,17 @@ export const ResumeEditor = ({
             onChange={onSkillsChange}
             placeholder="React, JavaScript, HTML/CSS"
             after={
-              <Button
-                mode="tertiary"
-                onClick={() => showTip('Укажите ключевые навыки, которые важны для вашей профессии')}
-              >
-                ?
-              </Button>
+              <Div style={{ display: 'flex', gap: 8 }}>
+                <EnhanceButton 
+                  onClick={() => openEnhancementModal(userData.skills.join(', '), 'навыки', 'skills')} 
+                />
+                <Button
+                  mode="tertiary"
+                  onClick={() => showTip('Укажите ключевые навыки, которые важны для вашей профессии')}
+                >
+                  ?
+                </Button>
+              </Div>
             }
           />
         </FormItem>
@@ -134,6 +210,7 @@ export const ResumeEditor = ({
           onAddEducation={onAddEducation}
           onRemoveEducation={onRemoveEducation}
           showTip={showTip}
+          onEnhance={openEnhancementModal}
         />
       </Group>
 
@@ -144,10 +221,10 @@ export const ResumeEditor = ({
           onAddExperience={onAddExperience}
           onRemoveExperience={onRemoveExperience}
           showTip={showTip}
+          onEnhance={openEnhancementModal}
         />
       </Group>
 
-      {/* Добавляем новую группу для кастомных секций */}
       <Group>
         <CustomSectionForm 
           customSections={userData.customSections || []}
@@ -156,6 +233,7 @@ export const ResumeEditor = ({
           onRemoveCustomSection={onRemoveCustomSection}
           onMoveCustomSection={onMoveCustomSection}
           showTip={showTip}
+          onEnhance={openEnhancementModal}
         />
       </Group>
     </Group>
