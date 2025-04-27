@@ -114,11 +114,6 @@ export const ResumeEditor = ({
           <Input
             value={userData.firstName}
             onChange={(e) => onInputChange('firstName', e.target.value)}
-            after={
-              <EnhanceButton 
-                onClick={() => openEnhancementModal(userData.firstName, 'имя', 'input', null, 'firstName')} 
-              />
-            }
           />
         </FormItem>
 
@@ -126,11 +121,6 @@ export const ResumeEditor = ({
           <Input
             value={userData.lastName}
             onChange={(e) => onInputChange('lastName', e.target.value)}
-            after={
-              <EnhanceButton 
-                onClick={() => openEnhancementModal(userData.lastName, 'фамилия', 'input', null, 'lastName')} 
-              />
-            }
           />
         </FormItem>
 
