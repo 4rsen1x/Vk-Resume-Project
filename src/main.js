@@ -8,6 +8,6 @@ vkBridge.send('VKWebAppInit');
 createRoot(document.getElementById('root')).render(<AppConfig />);
 
 // Enable development tools in development mode
-if (import.meta.env.MODE === 'development') {
-  import('./eruda.js');
-}
+// if (import.meta.env.MODE === 'development') {
+//   import('./eruda.js');
+// }
