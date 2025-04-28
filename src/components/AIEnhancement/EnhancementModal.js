@@ -13,7 +13,6 @@ import {
 } from '@vkontakte/vkui';
 import { Icon24Dismiss, Icon24CheckCircleOutline, Icon24CancelCircleOutline } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
-import { useAiEnhancement } from '../../utils/aiEnhancement';
 
 export const EnhancementModal = ({ 
   id, 
@@ -44,20 +43,15 @@ export const EnhancementModal = ({
       const basePrompt = "Enhance the following text to make it more professional and impactful for a resume: ";
       const prompt = customPrompt || basePrompt;
       
-      const response = await fetch(import.meta.env.VITE_OPENROUTER_API_URL, {
+      // Updated to use the backend API instead of directly calling OpenRouter
+      const response = await fetch('http://localhost:3001/api/enhance', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-chat:free',
-          messages: [
-            {
-              role: 'user',
-              content: `${prompt}\n\n${originalText}`,
-            },
-          ],
+          prompt,
+          originalText,
         }),
       });
 
@@ -66,10 +60,9 @@ export const EnhancementModal = ({
       }
 
       const data = await response.json();
-      const result = data.choices[0].message.content;
       
-      if (result) {
-        setEnhancedText(result);
+      if (data.result) {
+        setEnhancedText(data.result);
       }
     } catch (err) {
       setLocalError(err.message);

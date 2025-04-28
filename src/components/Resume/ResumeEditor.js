@@ -18,23 +18,25 @@ import { ExperienceForm } from './ExperienceForm';
 import { CustomSectionForm } from './CustomSectionForm';
 import { EnhanceButton, EnhancementModal } from '../AIEnhancement';
 
+// Add a new prop for the save function
 export const ResumeEditor = ({ 
-  userData, 
-  selectedTemplate, 
-  onInputChange, 
-  onEducationChange, 
-  onExperienceChange, 
-  onSkillsChange, 
-  onTemplateChange, 
-  onAddEducation, 
-  onAddExperience, 
-  onRemoveEducation, 
-  onRemoveExperience, 
+  userData,
+  selectedTemplate,
+  onInputChange, // Expects (name, value) now
+  onEducationChange, // Expects (index, name, value)
+  onExperienceChange, // Expects (index, name, value)
+  onSkillsChange,
+  onTemplateChange,
+  onAddEducation,
+  onAddExperience,
+  onRemoveEducation,
+  onRemoveExperience,
   onCustomSectionChange,
   onAddCustomSection,
   onRemoveCustomSection,
   onMoveCustomSection,
-  showTip 
+  showTip,
+  onSave // New prop for saving
 }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [enhancementData, setEnhancementData] = useState({
@@ -90,19 +92,20 @@ export const ResumeEditor = ({
     </ModalRoot>
   );
 
+  // Add onBlur handlers to input fields that will trigger the save
   return (
     <Group>
       {modal}
       <Group>
         <FormItem top="Фото">
-          <File
+          {/* <File
             before={<Icon24Camera />}
             size="m"
             mode="secondary"
             accept="image/*"
           >
             {userData.photo ? 'Изменить фото' : 'Загрузить фото'}
-          </File>
+          </File> */}
           {userData.photo && (
             <Div style={{ display: 'flex', justifyContent: 'center' }}>
               <Avatar size={100} src={userData.photo} />
@@ -114,6 +117,7 @@ export const ResumeEditor = ({
           <Input
             value={userData.firstName}
             onChange={(e) => onInputChange('firstName', e.target.value)}
+            onBlur={onSave} // Add onBlur handler
           />
         </FormItem>
 
@@ -147,27 +151,24 @@ export const ResumeEditor = ({
             value={userData.position}
             onChange={(e) => onInputChange('position', e.target.value)}
             placeholder="Frontend Developer"
-            after={
-              <EnhanceButton 
-                onClick={() => openEnhancementModal(userData.position, 'должность', 'input', null, 'position')} 
-              />
-            }
           />
         </FormItem>
       </Group>
 
       <Group>
-        <FormItem top="Шаблон резюме">
-          <Select
-            value={selectedTemplate}
-            onChange={onTemplateChange}
-            options={[
-              { value: 'classic', label: 'Классический' },
-              { value: 'modern', label: 'Современный' },
-              { value: 'creative', label: 'Креативный' }
-            ]}
-          />
-        </FormItem>
+      <FormItem top="Шаблон резюме">
+        <Select
+          name="template"
+          value={selectedTemplate} // This prop correctly receives the string state from Resume.js
+          // Corrected onChange: Extract the value from the event before calling the prop function
+          onChange={(e) => onTemplateChange(e.target.value)}
+          options={[
+            { value: 'classic', label: 'Классический' },
+            { value: 'modern', label: 'Современный' },
+            { value: 'creative', label: 'Креативный' },
+          ]}
+        />
+      </FormItem>
       </Group>
 
       <Group>
@@ -257,5 +258,6 @@ ResumeEditor.propTypes = {
   onAddCustomSection: PropTypes.func.isRequired,
   onRemoveCustomSection: PropTypes.func.isRequired,
   onMoveCustomSection: PropTypes.func.isRequired,
-  showTip: PropTypes.func.isRequired
+  showTip: PropTypes.func.isRequired,
+  onSave: PropTypes.func // Add this prop
 };

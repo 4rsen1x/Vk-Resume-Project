@@ -1,14 +1,4 @@
-import {
-  createHashRouter,
-  createPanel,
-  createRoot,
-  createView,
-  RoutesConfig,
-} from '@vkontakte/vk-mini-apps-router';
-
-export const DEFAULT_ROOT = 'default_root';
-
-export const DEFAULT_VIEW = 'default_view';
+import { createHashRouter, createPanel, RoutesConfig } from '@vkontakte/vk-mini-apps-router';
 
 export const DEFAULT_VIEW_PANELS = {
   HOME: 'home',
@@ -17,13 +7,10 @@ export const DEFAULT_VIEW_PANELS = {
 };
 
 export const routes = RoutesConfig.create([
-  createRoot(DEFAULT_ROOT, [
-    createView(DEFAULT_VIEW, [
-      createPanel(DEFAULT_VIEW_PANELS.HOME, '/', []),
-      createPanel(DEFAULT_VIEW_PANELS.PERSIK, `/${DEFAULT_VIEW_PANELS.PERSIK}`, []),
-      createPanel(DEFAULT_VIEW_PANELS.RESUME, `/${DEFAULT_VIEW_PANELS.RESUME}`, []),
-    ]),
-  ]),
+  createPanel(DEFAULT_VIEW_PANELS.HOME, '/'),
+  createPanel(DEFAULT_VIEW_PANELS.PERSIK, '/persik'),
+  // Define ':id' as an *optional* dynamic parameter in the path
+  createPanel(DEFAULT_VIEW_PANELS.RESUME, '/resume/:id?'), // Add '?' here
 ]);
 
 export const router = createHashRouter(routes.getRoutes());

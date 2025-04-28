@@ -55,11 +55,6 @@ export const CustomSectionForm = ({
                 value={section.title}
                 onChange={(e) => onCustomSectionChange(index, 'title', e.target.value)}
                 placeholder="Например: Проекты, Публикации, Хобби"
-                after={
-                  <EnhanceButton 
-                    onClick={() => onEnhance(section.title, 'название раздела', 'customSection', index, 'title')} 
-                  />
-                }
               />
             </FormItem>
             <Div style={{ display: 'flex', alignItems: 'center' }}>
