@@ -95,6 +95,7 @@ export const Resume = ({ id }) => {
           if (resume && isMounted) {
             console.log('Loaded resume data:', resume);
             // Merge fetched data with defaults and VK data
+            // Find where the default data is initialized (around line 98-110)
             const defaultData = {
               firstName: vkUser.first_name || '',
               lastName: vkUser.last_name || '',
@@ -104,26 +105,52 @@ export const Resume = ({ id }) => {
               position: 'Frontend Developer',
               education: [{ institution: '', degree: '', year: '' }],
               experience: [{ company: '', position: '', period: '', description: '' }],
-              skills: ['React', 'JavaScript', 'HTML/CSS'],
+              skills: 'React, JavaScript, HTML/CSS', // Changed from array to string
               customSections: [],
               template: 'classic' // Default template string
             };
             const mergedData = { ...defaultData, ...(resume.data || {}) };
 
             // --- Ensure skills is always an array (existing fix) ---
-            if (mergedData.skills && !Array.isArray(mergedData.skills)) {
-              if (typeof mergedData.skills === 'string') {
-                mergedData.skills = mergedData.skills.split(',')
-                                      .map(skill => skill.trim())
-                                      .filter(skill => skill);
-              } else {
-                console.warn('Fetched skills data was not an array or string, defaulting.');
-                mergedData.skills = defaultData.skills;
-              }
-            } else if (!mergedData.skills) {
-               mergedData.skills = defaultData.skills;
-            }
+            // if (mergedData.skills && !Array.isArray(mergedData.skills)) {
+            //   if (typeof mergedData.skills === 'string') {
+            //     mergedData.skills = mergedData.skills.split(',')
+            //                           .map(skill => skill.trim())
+            //                           .filter(skill => skill);
+            //   } else {
+            //     console.warn('Fetched skills data was not an array or string, defaulting.');
+            //     mergedData.skills = defaultData.skills;
+            //   }
+            // } else if (!mergedData.skills) {
+            //    mergedData.skills = defaultData.skills;
+            // }
             // --- End of skills check ---
+
+            // --- Validate and Fix Custom Sections ---
+            if (mergedData.customSections && Array.isArray(mergedData.customSections)) {
+              mergedData.customSections = mergedData.customSections.map((section, index) => {
+                // Ensure section is an object and has a type, default to 'generic' if missing
+                if (typeof section !== 'object' || section === null) {
+                  console.warn(`Custom section at index ${index} is not an object, replacing with default generic.`);
+                  return { type: 'generic', id: Date.now() + Math.random() + index, title: 'Раздел', content: '' };
+                }
+                if (!section.type) {
+                  console.warn(`Custom section at index ${index} missing 'type', defaulting to 'generic'. Original section:`, section);
+                  // Attempt to preserve existing fields if possible, otherwise create a basic generic one
+                  return { ...section, type: 'generic', id: section.id || Date.now() + Math.random() + index };
+                }
+                // Ensure section has a unique ID
+                if (!section.id) {
+                   section.id = Date.now() + Math.random() + index;
+                }
+                return section;
+              }).filter(section => section !== null); // Filter out any potentially null sections if error handling was different
+            } else {
+              // If customSections is not an array or doesn't exist, initialize as empty array
+              mergedData.customSections = [];
+            }
+            // --- End of Custom Sections Validation ---
+
 
             // --- Explicitly check template type before setting state ---
             let templateValue = defaultData.template; // Start with default string
@@ -269,8 +296,17 @@ export const Resume = ({ id }) => {
     }));
   };
 
-  const handleSkillsChange = (newSkills) => {
-    setUserData(prev => ({ ...prev, skills: newSkills }));
+  // Find the handleSkillsChange function and replace it with:
+  
+  const handleSkillsChange = (e) => {
+  // Simply set the skills as a string directly
+  setUserData(prev => ({
+    ...prev,
+    skills: e.target.value
+  }));
+  
+  // Trigger save if needed
+  // debouncedSave();
   };
 
   const handleTemplateChange = (newTemplate) => {
@@ -279,39 +315,119 @@ export const Resume = ({ id }) => {
     // saveResumeData(); // Uncomment if you want template change to trigger save
   };
 
-  const handleCustomSectionChange = (index, field, value) => {
-    const updatedSections = [...userData.customSections];
-    updatedSections[index] = { ...updatedSections[index], [field]: value };
-    setUserData(prev => ({ ...prev, customSections: updatedSections }));
+  // const handleCustomSectionChange = (index, field, value) => {
+  //   const updatedSections = [...userData.customSections];
+  //   updatedSections[index] = { ...updatedSections[index], [field]: value };
+  //   setUserData(prev => ({ ...prev, customSections: updatedSections }));
+  // };
+
+  // --- Custom Section Handlers ---
+
+  // Add a new custom section of a specific type with its initial fields
+  const addCustomSection = (sectionType) => {
+    setUserData(prev => {
+      let newSectionBase = { type: sectionType, id: Date.now() + Math.random() }; // Use a more unique ID
+      let newSectionSpecifics = {};
+
+      // Initialize fields based on the selected type
+      switch (sectionType) {
+        case 'project':
+          newSectionSpecifics = { title: '', description: '', technologies: '', link: '' };
+          break;
+        case 'certification':
+          newSectionSpecifics = { name: '', organization: '', date: '' };
+          break;
+        case 'language':
+          newSectionSpecifics = { language: '', proficiency: 'native' }; // Default proficiency
+          break;
+        case 'generic': // Fallback for simple title/content
+        default:
+          // Ensure type is explicitly 'generic' if falling through
+          newSectionBase.type = 'generic';
+          newSectionSpecifics = { title: '', content: '' };
+          break;
+      }
+
+      // Combine base info (id, type) with type-specific fields
+      const newSection = { ...newSectionBase, ...newSectionSpecifics };
+
+      return {
+        ...prev,
+        // Ensure customSections is always an array before spreading
+        customSections: [...(prev.customSections || []), newSection]
+      };
+    });
+    // Manual save will handle persistence
   };
 
-  const addCustomSection = () => {
-    setUserData(prev => ({
-      ...prev,
-      customSections: [...prev.customSections, { title: 'Новый раздел', content: '' }]
-    }));
+  // Update a field within a specific custom section
+  const handleCustomSectionChange = (index, fieldName, value) => {
+    setUserData(prev => {
+      // Ensure customSections exists and is an array
+      if (!prev.customSections || !Array.isArray(prev.customSections)) {
+        console.error("customSections is not an array in state:", prev.customSections);
+        return prev; // Avoid errors if state is malformed
+      }
+      const updatedSections = prev.customSections.map((section, i) => {
+        if (i === index) {
+          // Ensure the section being updated is an object
+          if (typeof section !== 'object' || section === null) {
+             console.error(`Section at index ${index} is not an object:`, section);
+             return {}; // Return an empty object or handle error appropriately
+          }
+          return { ...section, [fieldName]: value };
+        }
+        return section;
+      });
+      return { ...prev, customSections: updatedSections };
+    });
+     // Manual save will handle persistence
   };
 
+  // Remove a custom section
   const removeCustomSection = (index) => {
     setUserData(prev => ({
       ...prev,
-      customSections: prev.customSections.filter((_, i) => i !== index)
+      // Ensure customSections exists before filtering
+      customSections: (prev.customSections || []).filter((_, i) => i !== index)
     }));
+     // Manual save will handle persistence
   };
 
+  // Move a custom section up or down
   const moveCustomSection = (index, direction) => {
-    const updatedSections = [...userData.customSections];
-    const newIndex = index + direction;
-    if (newIndex >= 0 && newIndex < updatedSections.length) {
-      [updatedSections[index], updatedSections[newIndex]] = [updatedSections[newIndex], updatedSections[index]]; // Swap elements
-      setUserData(prev => ({ ...prev, customSections: updatedSections }));
-    }
+    setUserData(prev => {
+      // Ensure customSections exists and has enough elements
+      if (!prev.customSections || prev.customSections.length < 2) {
+        return prev;
+      }
+      const sections = [...prev.customSections];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+      if (targetIndex < 0 || targetIndex >= sections.length) {
+        return prev; // Cannot move outside bounds
+      }
+
+      // Swap elements
+      [sections[index], sections[targetIndex]] = [sections[targetIndex], sections[index]];
+
+      return { ...prev, customSections: sections };
+    });
+     // Manual save will handle persistence
   };
+
+  // --- End Custom Section Handlers ---
 
   const downloadResume = async () => {
-    if (!resumeRef.current) return;
-    showTip('Начинаем генерацию PDF...');
+    
     try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    
+      if (!resumeRef?.current) {
+        console.error('Resume ref not available');
+        showTip('Ошибка: элемент для генерации PDF не найден');
+        return;
+      }
       // Ensure background is white for canvas capture
       resumeRef.current.style.backgroundColor = '#ffffff';
       const canvas = await html2canvas(resumeRef.current, {
@@ -529,11 +645,11 @@ export const Resume = ({ id }) => {
           onSave={saveResumeData} // Pass the manual save function
         />
       ) : (
-        <ResumePreview
+        <ResumePreview 
+          ref={resumeRef}
           userData={userData}
-          selectedTemplate={selectedTemplate} // Prop being passed
-          resumeRef={resumeRef}
-          onDownloadResume={downloadResume} // Now defined
+          selectedTemplate={selectedTemplate}
+          onDownloadResume={downloadResume}
         />
       )}
 

@@ -174,13 +174,19 @@ export const ResumeEditor = ({
       <Group>
         <FormItem top="Навыки (через запятую)">
           <Textarea
-            value={userData.skills.join(', ')}
+            // Simplified: Just use the skills as a string directly
+            value={userData.skills || ''}
             onChange={onSkillsChange}
             placeholder="React, JavaScript, HTML/CSS"
             after={
               <Div style={{ display: 'flex', gap: 8 }}>
-                <EnhanceButton 
-                  onClick={() => openEnhancementModal(userData.skills.join(', '), 'навыки', 'skills')} 
+                <EnhanceButton
+                  onClick={() => openEnhancementModal(
+                    // Simplified: Just pass the skills string directly
+                    userData.skills || '',
+                    'навыки',
+                    'skills'
+                  )}
                 />
                 <Button
                   mode="tertiary"
@@ -241,7 +247,7 @@ ResumeEditor.propTypes = {
     position: PropTypes.string,
     education: PropTypes.array,
     experience: PropTypes.array,
-    skills: PropTypes.array,
+    skills: PropTypes.string, // Changed from array to string
     customSections: PropTypes.array
   }).isRequired,
   selectedTemplate: PropTypes.string.isRequired,

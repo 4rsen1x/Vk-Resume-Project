@@ -1,54 +1,65 @@
-import React from 'react';
-import { Div, Button, Group } from '@vkontakte/vkui';
-import { Icon24Document } from '@vkontakte/icons';
+import React, { useState, useEffect, forwardRef } from 'react';
 import PropTypes from 'prop-types';
+import { Div, Button } from '@vkontakte/vkui';
 import { ResumeTemplates } from './ResumeTemplates';
 
-export const ResumePreview = ({ 
-  userData, 
-  selectedTemplate, 
-  resumeRef, 
-  onDownloadResume 
-}) => {
+export const ResumePreview = forwardRef(({ userData, selectedTemplate, onDownloadResume }, ref) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isRefReady, setIsRefReady] = useState(false);
+
+  useEffect(() => {
+    if (ref && ref.current) {
+      setIsRefReady(true);
+    }
+  }, [ref]);
+
+  if (!userData) {
+    return <Div>Загрузка данных...</Div>;
+  }
+
+  const handleDownload = async () => {
+    if (!isRefReady) {
+      console.error('Resume ref not ready for download');
+      return;
+    }
+    
+    setIsDownloading(true);
+    try {
+      await onDownloadResume();
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
-    <Group>
-      <Div>
+    <Div>
+      <Div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
         <Button 
-          before={<Icon24Document />} 
-          size="m" 
-          mode="primary" 
-          onClick={() => onDownloadResume('PDF')}
-          stretched
+          size="l" 
+          onClick={handleDownload}
+          loading={isDownloading}
+          disabled={isDownloading || !isRefReady}
         >
-          Скачать PDF
+          {isDownloading ? 'Генерация PDF...' : 'Скачать PDF'}
         </Button>
       </Div>
-      <Div>
-        <div ref={resumeRef}>
-          <ResumeTemplates 
-            templateType={selectedTemplate} 
-            userData={userData} 
-          />
-        </div>
-      </Div>
-    </Group>
+      <div id="resume-preview-content" ref={ref}>
+        <ResumeTemplates userData={userData} selectedTemplate={selectedTemplate} />
+      </div>
+    </Div>
   );
-};
+});
+
+ResumePreview.displayName = 'ResumePreview';
 
 ResumePreview.propTypes = {
-  userData: PropTypes.shape({
-    firstName: PropTypes.string,
-    lastName: PropTypes.string,
-    photo: PropTypes.string,
-    email: PropTypes.string,
-    phone: PropTypes.string,
-    position: PropTypes.string,
-    education: PropTypes.array,
-    experience: PropTypes.array,
-    skills: PropTypes.array,
-    customSections: PropTypes.array // Добавляем поддержку кастомных секций
-  }).isRequired,
+  userData: PropTypes.object,
   selectedTemplate: PropTypes.string.isRequired,
-  resumeRef: PropTypes.object.isRequired,
-  onDownloadResume: PropTypes.func.isRequired
+  onDownloadResume: PropTypes.func.isRequired,
+};
+
+ResumePreview.defaultProps = {
+  userData: {},
 };
