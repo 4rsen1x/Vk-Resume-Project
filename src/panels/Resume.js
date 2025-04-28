@@ -275,11 +275,16 @@ export const Resume = ({ id }) => {
     }));
   };
 
-  const handleExperienceChange = (index, e) => {
-    const { name, value } = e.target;
+  const handleExperienceChange = (index, name, value) => {
+    // const { name, value } = e.target;
     const updatedExperience = [...userData.experience];
+    if (updatedExperience[index]) {
     updatedExperience[index] = { ...updatedExperience[index], [name]: value };
     setUserData(prev => ({ ...prev, experience: updatedExperience }));
+    }
+    else {
+      console.warn(`Attempted to update experience at invalid index: ${index}`);
+    }
   };
 
   const addExperience = () => {
@@ -627,20 +632,20 @@ export const Resume = ({ id }) => {
       ) : activeTab === 'edit' ? (
         <ResumeEditor
           userData={userData}
-          selectedTemplate={selectedTemplate} // Prop being passed
+          selectedTemplate={selectedTemplate}
           onInputChange={handleInputChange}
-          onEducationChange={handleEducationChange} // Now defined
-          onExperienceChange={handleExperienceChange} // Now defined
-          onSkillsChange={handleSkillsChange} // Now defined
-          onTemplateChange={handleTemplateChange} // Now defined
-          onAddEducation={addEducation} // Now defined
-          onAddExperience={addExperience} // Now defined
-          onRemoveEducation={removeEducation} // Now defined
-          onRemoveExperience={removeExperience} // Now defined
-          onCustomSectionChange={handleCustomSectionChange} // Corrected typo and now defined
-          onAddCustomSection={addCustomSection} // Now defined
-          onRemoveCustomSection={removeCustomSection} // Now defined
-          onMoveCustomSection={moveCustomSection} // Now defined
+          onEducationChange={handleEducationChange}
+          onExperienceChange={handleExperienceChange}  
+          onSkillsChange={handleSkillsChange}  
+          onTemplateChange={handleTemplateChange}  
+          onAddEducation={addEducation}  
+          onAddExperience={addExperience}  
+          onRemoveEducation={removeEducation}  
+          onRemoveExperience={removeExperience}  
+          onCustomSectionChange={handleCustomSectionChange}
+          onAddCustomSection={addCustomSection}  
+          onRemoveCustomSection={removeCustomSection}  
+          onMoveCustomSection={moveCustomSection}  
           showTip={showTip}
           onSave={saveResumeData} // Pass the manual save function
         />
